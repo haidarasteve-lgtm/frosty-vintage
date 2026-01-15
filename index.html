@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>FrostY3X_vintage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="logo">FrostY3X_vintage</div>
+  <button class="cart-btn" onclick="toggleCart(event)">
+    CART (<span id="cart-count">0</span>)
+  </button>
+</header>
+
+<section class="hero">
+  <h1>VINTAGE<br>ARCHIVE</h1>
+  <p>BUY VIA INSTAGRAM OR PAYPAL</p>
+</section>
+
+<main class="shop">
+
+  <!-- PRODUCT 1 -->
+  <div class="product">
+    <button class="expand-btn">＋</button>
+    <img src="ami-black.jpg" alt="AMI Heart Sweater Black" class="product-img">
+    <h2>AMI HEART SWEATER BLACK</h2>
+    <span>49,95 €</span>
+    <select class="size">
+      <option value="S">SIZE S</option>
+    </select>
+    <button class="buy" onclick="addToCart('AMI HEART SWEATER BLACK','S',49.95)">
+      ADD TO CART
+    </button>
+  </div>
+
+  <!-- PRODUCT 2 -->
+  <div class="product">
+    <button class="expand-btn">＋</button>
+    <img src="ami-white.jpg" alt="AMI Heart Sweater White" class="product-img">
+    <h2>AMI HEART SWEATER WHITE</h2>
+    <span>49,95 €</span>
+    <select class="size">
+      <option value="S">SIZE S</option>
+    </select>
+    <button class="buy" onclick="addToCart('AMI HEART SWEATER WHITE','S',49.95)">
+      ADD TO CART
+    </button>
+  </div>
+
+</main>
+
+<!-- PRODUCT MODAL -->
+<div class="product-modal" id="product-modal">
+  <button class="modal-close" onclick="closeModal()">←</button>
+  <img id="modal-img" src="" alt="">
+  <h2 id="modal-name"></h2>
+  <span id="modal-price"></span>
+  <select id="modal-size">
+    <option value="S">SIZE S</option>
+  </select>
+  <button id="modal-add" class="buy">ADD TO CART</button>
+</div>
+
+<!-- CART -->
+<div class="cart" id="cart">
+  <button class="close-cart" onclick="closeCart()">✕</button>
+  <h2>CART</h2>
+  <ul id="cart-items"></ul>
+
+  <div class="user-info">
+    <input type="text" id="customer-name" placeholder="Name" />
+    <input type="email" id="customer-email" placeholder="Email" />
+    <input type="text" id="customer-address" placeholder="Adresse" />
+  </div>
+
+  <div class="summary">
+    <p>Shipping: 10,00 €</p>
+    <p><strong>Total: <span id="total">0,00 €</span></strong></p>
+  </div>
+
+  <a class="buy" id="checkout" href="#" target="_blank">
+    BUY VIA INSTAGRAM
+  </a>
+
+  <form action="https://www.paypal.com/donate" method="post" target="_blank">
+    <input type="hidden" name="business" value="frosty3xvintage">
+    <input type="hidden" name="currency_code" value="EUR">
+    <input type="submit" value="PAYPAL" class="paypal-btn">
+  </form>
+</div>
+
+<footer>
+  <p>© 2026 FrostY3X_vintage</p>
+</footer>
+
+<script>
+  // CART SYSTEM
+  let cart = [];
+  const shipping = 10;
+
+  function addToCart(name, size, price) {
+    cart.push({ name, size, price });
+    updateCart();
+    openCart();
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCart();
+  }
+
+  function updateCart() {
+    const list = document.getElementById("cart-items");
+    const count = document.getElementById("cart-count");
+    const totalEl = document.getElementById("total");
+
+    list.innerHTML = "";
+    count.innerText = cart.length;
+
+    let subtotal = 0;
+    const name = document.getElementById("customer-name").value || "Name nicht angegeben";
+    const email = document.getElementById("customer-email").value || "Email nicht angegeben";
+    const address = document.getElementById("customer-address").value || "Adresse nicht angegeben";
+
+    let message = `Hey, I want to buy:%0AName: ${name}%0AEmail: ${email}%0AAdresse: ${address}%0A`;
+
+    cart.forEach((item, index) => {
+      subtotal += item.price;
+      const li = document.createElement("li");
+      li.innerHTML = `
+        ${item.name} — SIZE ${item.size} — ${item.price.toFixed(2)} €
+        <button class="remove" onclick="removeFromCart(${index})">✕</button>
+      `;
+      list.appendChild(li);
+      message += `- ${item.name} (SIZE ${item.size})%0A`;
+    });
+
+    const total = cart.length ? subtotal + shipping : 0;
+    totalEl.innerText = total.toFixed(2) + " €";
+    document.getElementById("checkout").href = "https://www.instagram.com/frosty3x.vintage?text=" + message;
+  }
+
+  function toggleCart(e) { e.stopPropagation(); document.getElementById("cart").classList.toggle("open"); }
+  function openCart() { document.getElementById("cart").classList.add("open"); }
+  function closeCart() { document.getElementById("cart").classList.remove("open"); }
+
+  // PLUS-ZEICHEN ZOOM
+  document.querySelectorAll('.expand-btn').forEach(btn => {
+    let state = 0;
+    btn.addEventListener('click', () => {
+      const product = btn.parentElement;
+      state = (state + 1) % 4;
+      switch(state){
+        case 0: product.style.transform = 'scale(1)'; break;
+        case 1: product.style.transform = 'scale(1.5)'; break;
+        case 2: product.style.transform = 'scale(0.5)'; break;
+        case 3: product.style.transform = 'scale(0.8)'; break;
+      }
+    });
+  });
+
+  // PRODUCT MODAL
+  const modal = document.getElementById('product-modal');
+  const modalImg = document.getElementById('modal-img');
+  const modalName = document.getElementById('modal-name');
+  const modalPrice = document.getElementById('modal-price');
+  const modalSize = document.getElementById('modal-size');
+  const modalAdd = document.getElementById('modal-add');
+
+  document.querySelectorAll('.product').forEach(product => {
+    product.addEventListener('click', (e) => {
+      if(e.target.classList.contains('expand-btn') || e.target.classList.contains('buy')) return;
+      const img = product.querySelector('img').src;
+      const name = product.querySelector('h2').innerText;
+      const price = product.querySelector('span').innerText;
+      const sizeOptions = product.querySelector('.size').innerHTML;
+
+      modalImg.src = img;
+      modalName.innerText = name;
+      modalPrice.innerText = price;
+      modalSize.innerHTML = sizeOptions;
+
+      modal.classList.add('open');
+
+      modalAdd.onclick = () => {
+        const selectedSize = modalSize.value;
+        const priceNum = parseFloat(price.replace('€','').trim());
+        addToCart(name, selectedSize, priceNum);
+        closeModal();
+      };
+    });
+  });
+
+  function closeModal() { modal.classList.remove('open'); }
+</script>
+
+</body>
+</html>
